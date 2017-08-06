@@ -1,31 +1,24 @@
-# Spring Boot WebJsp wth Docker Integration
+# SpringBoot+Web+Jsp with Docker Integration
 
 ### Purpose
 
-The Purpose.
+Useful as a *template* project to get you going quickly with docker and integration tests using docker containers.
 
 ### Prereqisites
 
 - Java 8.x
 - Maven 3.x
-- Docker
+- Docker installed locally and DOCKER_HOST environment variable set, e.g. DOCKER_HOST=tcp://localhost:2375
 
 
 ### Quickstart
 
-Then run the app:
 ```
-mvn spring-boot:run
+mvn clean verify
 ```
-
-### Building / Developer workflow
-- To build a releaseable artifact:
-```
-mvn clean package
-```
-
 
 ### Notes
+- See https://dmp.fabric8.io/ for details documentation for the docker-maven-plugin.
 
 
 
