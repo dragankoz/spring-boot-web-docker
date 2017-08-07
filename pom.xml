@@ -141,7 +141,7 @@
                             <images>
                                 <image>
                                     <name>${docker.groupId}/${project.groupId}/${project.artifactId}:${project.version}</name>
-                                    <alias>dockerfile</alias>
+                                    <!--<alias>app</alias>-->
                                     <build>
                                         <filter>@</filter>
                                         <dockerFileDir>${project.basedir}/src/main/docker</dockerFileDir>
