@@ -26,6 +26,7 @@
 
         <docker-maven-plugin.version>0.21.0</docker-maven-plugin.version>
         <docker.groupId>demostuff</docker.groupId>
+        <spring-server-port>8080</spring-server-port>
     </properties>
 
     <dependencies>
@@ -138,27 +139,32 @@
                         <groupId>io.fabric8</groupId>
                         <artifactId>docker-maven-plugin</artifactId>
                         <configuration>
+                            <showLogs>true</showLogs>
+                            <detail>true</detail>
+                            <buildArgs>
+                                <artifact>${project.build.finalName}.${project.packaging}</artifact>
+                                <port>${spring-server-port}</port>
+                            </buildArgs>
                             <images>
                                 <image>
                                     <name>${docker.groupId}/${project.artifactId}:${project.version}</name>
-                                    <!--<alias>app</alias>-->
                                     <build>
                                         <filter>@</filter>
                                         <dockerFileDir>${project.basedir}/src/main/docker</dockerFileDir>
                                         <assembly>
-                                            <descriptorRef>rootWar</descriptorRef>
+                                            <descriptorRef>artifact</descriptorRef>
                                         </assembly>
                                     </build>
                                     <run>
                                         <ports>
-                                            <port>app.port:8080</port>
+                                            <port>random.app.port:${spring-server-port}</port>
                                         </ports>
                                         <wait>
                                             <!-- The plugin waits until this URL is reachable via HTTP ... -->
                                             <http>
-                                                <url>http://${docker.host.address}:${app.port}</url>
+                                                <url>http://${docker.host.address}:${random.app.port}</url>
                                             </http>
-                                            <time>10000</time>
+                                            <time>120000</time>
                                         </wait>
                                     </run>
                                 </image>
@@ -202,7 +208,7 @@
                         </executions>
                         <configuration>
                             <systemPropertyVariables>
-                                <app.url>http://${docker.host.address}:${app.port}</app.url>
+                                <app.url>http://${docker.host.address}:${random.app.port}</app.url>
                             </systemPropertyVariables>
                             <includes>**/*IT.java</includes>
                         </configuration>
