@@ -1,98 +1,135 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
-    <groupId>org.demo</groupId>
-    <artifactId>spring-boot-web-jsp-docker</artifactId>
-    <packaging>war</packaging>
+    <groupId>org.demostuff</groupId>
+    <artifactId>spring-boot-web-docker-parent</artifactId>
     <version>1.0.0-SNAPSHOT</version>
-
-    <name>spring-boot-web-jsp-docker</name>
-    <description>Spring Boot Web JSP Example with Docker Integration</description>
+    <packaging>pom</packaging>
+    <name>Parent POM for Demo Stuff Apps</name>
+    <description>Parent POM for Demo Stuff Apps</description>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>1.5.6.RELEASE</version>
+        <version>1.5.2.RELEASE</version>
     </parent>
+
+    <organization>
+        <name>Demo Stuff Organisation</name>
+    </organization>
+
+    <!-- Deployment targets for shared jars/artifacts -->
+    <distributionManagement>
+        <repository>
+            <id>libs-release-local</id>
+            <name>libs-release-local</name>
+            <url>${libs-release-local-url}</url>
+        </repository>
+        <snapshotRepository>
+            <id>libs-snapshot-local</id>
+            <name>libs-snapshot-local</name>
+            <url>${libs-snapshot-local-url}</url>
+        </snapshotRepository>
+    </distributionManagement>
+
+    <modules>
+        <module>app</module>
+    </modules>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-
         <java.version>1.8</java.version>
-        <maven-surefire-failsafe-plugin.version>2.20</maven-surefire-failsafe-plugin.version>
+        <timestamp>${maven.build.timestamp}</timestamp>
+        <maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
 
-        <docker-maven-plugin.version>0.21.0</docker-maven-plugin.version>
-        <docker.groupId>demostuff</docker.groupId>
-        <spring-server-port>8080</spring-server-port>
+        <swagger.version>2.6.1</swagger.version>
+        <orika-core.version>1.5.1</orika-core.version>
+        <commons-io.version>2.5</commons-io.version>
+        <lombok.version>1.16.16</lombok.version>
+
+        <!-- Plugin versions -->
+        <maven-source-plugin.version>3.0.1</maven-source-plugin.version>
+        <jacoco-maven-plugin.version>0.7.9</jacoco-maven-plugin.version>
+        <docker-maven-plugin.version>0.22.1</docker-maven-plugin.version>
+        <maven-surefire-failsafe-plugin.version>2.20</maven-surefire-failsafe-plugin.version>
+        <maven-deploy-plugin.version>2.8.2</maven-deploy-plugin.version>
+        <build-helper-maven-plugin.version>3.0.0</build-helper-maven-plugin.version>
+        <git-commit-id-plugin.version>2.2.3</git-commit-id-plugin.version>
+        <groovy-maven-plugin.version>2.0</groovy-maven-plugin.version>
+        <maven-invoker-plugin.version>3.0.1</maven-invoker-plugin.version>
+
+        <!-- Dont skip unit tests by default -->
+        <maven.surefire.skip>false</maven.surefire.skip>
+        <!-- Dont skip all tests by default -->
+        <maven.test.skip>false</maven.test.skip>
+
+        <!-- Property to denote this is a docker artifact -->
+        <!-- Skip docker artifact processing by default, 'true' will enable docker stuff for the child project -->
+        <docker.skip>true</docker.skip>
+        <!-- default docker repo id to push to -->
+        <docker.namespace>demostuff/</docker.namespace>
+        <!-- default docker tag -->
+        <docker.tag>latest</docker.tag>
+        <!-- Placeholder docker tag1 -->
+        <docker.tag1/>
+        <!-- Placeholder docker tag2 -->
+        <docker.tag2/>
+        <!-- Placeholder docker tag3 -->
+        <docker.tag3/>
+
+        <!-- default docker artifact id -->
+        <docker.artifact.id>${project.artifactId}</docker.artifact.id>
+        <!-- default docker image name -->
+        <docker.image.name>${docker.namespace}${docker.artifact.id}</docker.image.name>
+        <!-- default internal app listening port -->
+        <docker.internal.app.port>8080</docker.internal.app.port>
+        <!-- default dir to find Dockerfile -->
+        <docker.file.dir>${project.basedir}/src/main/docker</docker.file.dir>
+        <!-- Can be overridden with -D if you dont want these targets to run individually -->
+        <docker.skip.build>false</docker.skip.build>
+        <!-- Tie this to the maven.test.skip property -->
+        <docker.skip.run>${maven.test.skip}</docker.skip.run>
+        <!-- Dont skip docker push to repo by default -->
+        <docker.skip.push>false</docker.skip.push>
+
+        <chrome.binaries.basedir>${project.basedir}/binaries</chrome.binaries.basedir>
     </properties>
 
-    <dependencies>
-
-        <!-- Web -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-
-        <!-- Web with Tomcat + Embed -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-tomcat</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-        <!-- JSTL -->
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>jstl</artifactId>
-        </dependency>
-
-        <!-- Need this to compile JSP -->
-        <dependency>
-            <groupId>org.apache.tomcat.embed</groupId>
-            <artifactId>tomcat-embed-jasper</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-        <!-- Need this to compile JSP -->
-        <dependency>
-            <groupId>org.eclipse.jdt.core.compiler</groupId>
-            <artifactId>ecj</artifactId>
-            <version>4.6.1</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <!-- Optional, for bootstrap -->
-        <dependency>
-            <groupId>org.webjars</groupId>
-            <artifactId>bootstrap</artifactId>
-            <version>3.3.7</version>
-        </dependency>
-        <dependency>
-            <groupId>org.webjars</groupId>
-            <artifactId>jquery</artifactId>
-            <version>3.2.1</version>
-        </dependency>
-
-        <!-- Test -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
-
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>Dalston.SR1</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <build>
+        <defaultGoal>install</defaultGoal>
+
         <pluginManagement>
             <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-source-plugin</artifactId>
+                    <version>${maven-source-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>${jacoco-maven-plugin.version}</version>
+                </plugin>
                 <plugin>
                     <groupId>io.fabric8</groupId>
                     <artifactId>docker-maven-plugin</artifactId>
                     <version>${docker-maven-plugin.version}</version>
+                    <configuration>
+                        <verbose>true</verbose>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -104,22 +141,155 @@
                     <artifactId>maven-failsafe-plugin</artifactId>
                     <version>${maven-surefire-failsafe-plugin.version}</version>
                 </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-deploy-plugin</artifactId>
+                    <version>${maven-deploy-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>build-helper-maven-plugin</artifactId>
+                    <version>${build-helper-maven-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>pl.project13.maven</groupId>
+                    <artifactId>git-commit-id-plugin</artifactId>
+                    <version>${git-commit-id-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.gmaven</groupId>
+                    <artifactId>groovy-maven-plugin</artifactId>
+                    <version>${groovy-maven-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-invoker-plugin</artifactId>
+                    <version>${maven-invoker-plugin.version}</version>
+                </plugin>
             </plugins>
         </pluginManagement>
 
         <plugins>
-            <!-- Package as an executable jar/war -->
             <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                </configuration>
             </plugin>
-
+            <!-- Added source:jar-no-fork goal to the verify phase so code inspection can find source in eclipse -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>default-prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>default-report</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <includes>**/*Test.java</includes>
+                    <includes>**/*Test*.java</includes>
+                    <skipTests>${maven.surefire.skip}</skipTests>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <descriptor>src/main/assembly/assembly.xml</descriptor>
+                    <archive>
+                        <manifestEntries>
+                            <Implementation-Title>${project.groupId}.${project.artifactId}</Implementation-Title>
+                            <Implementation-Vendor>${project.organization.name}</Implementation-Vendor>
+                            <Implementation-Version>${project.version}</Implementation-Version>
+                            <Built-By>${env.USER}</Built-By>
+                            <Ci-BuildTimestamp>${timestamp}</Ci-BuildTimestamp>
+                            <Ci-BuildNumber>${env.BUILD_NUMBER}</Ci-BuildNumber>
+                            <Ci-Url>${env.BUILD_URL}</Ci-Url>
+                            <Scm-Branch>${env.BRANCH_NAME}</Scm-Branch>
+                            <Scm-Revision>${env.GIT_COMMIT}</Scm-Revision>
+                            <Scm-Url>${env.GIT_URL}</Scm-Url>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+
+            <!-- Add build information to JAR package (if any) -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifestEntries>
+                            <Implementation-Title>${project.groupId}.${project.artifactId}</Implementation-Title>
+                            <Implementation-Vendor>${project.organization.name}</Implementation-Vendor>
+                            <Implementation-Version>${project.version}</Implementation-Version>
+                            <Built-By>${env.USER}</Built-By>
+                            <Ci-BuildTimestamp>${timestamp}</Ci-BuildTimestamp>
+                            <Ci-BuildNumber>${env.BUILD_NUMBER}</Ci-BuildNumber>
+                            <Ci-Url>${env.BUILD_URL}</Ci-Url>
+                            <Scm-Branch>${env.BRANCH_NAME}</Scm-Branch>
+                            <Scm-Revision>${env.GIT_COMMIT}</Scm-Revision>
+                            <Scm-Url>${env.GIT_URL}</Scm-Url>
+                        </manifestEntries>
+                    </archive>
+                    <skipIfEmpty>true</skipIfEmpty>
+                </configuration>
+            </plugin>
+
+            <!-- Add build information to WAR package (if any) -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifestEntries>
+                            <Implementation-Title>${project.groupId}.${project.artifactId}</Implementation-Title>
+                            <Implementation-Vendor>${project.organization.name}</Implementation-Vendor>
+                            <Implementation-Version>${project.version}</Implementation-Version>
+                            <Built-By>${env.USER}</Built-By>
+                            <Ci-BuildTimestamp>${timestamp}</Ci-BuildTimestamp>
+                            <Ci-BuildNumber>${env.BUILD_NUMBER}</Ci-BuildNumber>
+                            <Ci-Url>${env.BUILD_URL}</Ci-Url>
+                            <Scm-Branch>${env.BRANCH_NAME}</Scm-Branch>
+                            <Scm-Revision>${env.GIT_COMMIT}</Scm-Revision>
+                            <Scm-Url>${env.GIT_URL}</Scm-Url>
+                        </manifestEntries>
+                    </archive>
+                    <failOnMissingWebXml>false</failOnMissingWebXml>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
 
         </plugins>
@@ -127,7 +297,42 @@
 
     <profiles>
         <profile>
-            <id>docker</id>
+            <id>maven-enforcer</id>
+            <activation>
+                <property>
+                    <name>snapshotDependencyAllowed</name>
+                    <value>false</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-enforcer-plugin</artifactId>
+                        <version>3.0.0-M1</version>
+                        <executions>
+                            <execution>
+                                <id>enforce-no-snapshots</id>
+                                <goals>
+                                    <goal>enforce</goal>
+                                </goals>
+                                <configuration>
+                                    <rules>
+                                        <requireReleaseDeps>
+                                            <message>No SNAPSHOT dependencies allowed!</message>
+                                        </requireReleaseDeps>
+                                    </rules>
+                                    <fail>true</fail>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>docker-build</id>
             <activation>
                 <property>
                     <name>env.DOCKER_HOST</name>
@@ -138,84 +343,85 @@
                     <plugin>
                         <groupId>io.fabric8</groupId>
                         <artifactId>docker-maven-plugin</artifactId>
-                        <configuration>
-                            <showLogs>true</showLogs>
-                            <detail>true</detail>
-                            <buildArgs>
-                                <artifact>${project.build.finalName}.${project.packaging}</artifact>
-                                <port>${spring-server-port}</port>
-                            </buildArgs>
-                            <images>
-                                <image>
-                                    <name>${docker.groupId}/${project.artifactId}:${project.version}</name>
-                                    <build>
-                                        <filter>@</filter>
-                                        <dockerFileDir>${project.basedir}/src/main/docker</dockerFileDir>
-                                        <assembly>
-                                            <descriptorRef>artifact</descriptorRef>
-                                        </assembly>
-                                    </build>
-                                    <run>
-                                        <ports>
-                                            <port>random.app.port:${spring-server-port}</port>
-                                        </ports>
-                                        <wait>
-                                            <!-- The plugin waits until this URL is reachable via HTTP ... -->
-                                            <http>
-                                                <url>http://${docker.host.address}:${random.app.port}</url>
-                                            </http>
-                                            <time>120000</time>
-                                        </wait>
-                                    </run>
-                                </image>
-                            </images>
-                        </configuration>
                         <executions>
                             <execution>
-                                <id>start</id>
-                                <phase>pre-integration-test</phase>
+                                <id>docker-build-start</id>
+                                <phase>package</phase>
                                 <goals>
                                     <goal>build</goal>
-                                    <goal>start</goal>
                                 </goals>
-                            </execution>
-                            <execution>
-                                <id>stop</id>
-                                <phase>post-integration-test</phase>
-                                <goals>
-                                    <goal>stop</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-failsafe-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>integration-test</id>
-                                <goals>
-                                    <goal>integration-test</goal>
-                                </goals>
-                            </execution>
-                            <execution>
-                                <id>verify</id>
-                                <goals>
-                                    <goal>verify</goal>
-                                </goals>
+                                <configuration>
+                                    <buildArgs>
+                                        <artifact>${project.build.finalName}.${project.packaging}</artifact>
+                                        <port>${docker.internal.app.port}</port>
+                                    </buildArgs>
+                                    <images>
+                                        <image>
+                                            <name>${docker.image.name}</name>
+                                            <build>
+                                                <assembly>
+                                                    <descriptorRef>artifact</descriptorRef>
+                                                </assembly>
+                                                <dockerFileDir>${docker.file.dir}</dockerFileDir>
+                                                <tags>
+                                                    <tag>${docker.tag}</tag>
+                                                    <tag>${docker.tag1}</tag>
+                                                    <tag>${docker.tag2}</tag>
+                                                    <tag>${docker.tag3}</tag>
+                                                </tags>
+                                            </build>
+                                        </image>
+                                    </images>
+                                </configuration>
                             </execution>
                         </executions>
-                        <configuration>
-                            <systemPropertyVariables>
-                                <app.url>http://${docker.host.address}:${random.app.port}</app.url>
-                            </systemPropertyVariables>
-                            <includes>**/*IT.java</includes>
-                        </configuration>
                     </plugin>
                 </plugins>
             </build>
         </profile>
+
+        <profile>
+            <id>docker-push</id>
+            <activation>
+                <property>
+                    <name>env.DOCKER_REGISTRY</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>io.fabric8</groupId>
+                        <artifactId>docker-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>docker-push</id>
+                                <phase>install</phase>
+                                <goals>
+                                    <goal>push</goal>
+                                </goals>
+                                <configuration>
+                                    <images>
+                                        <image>
+                                            <name>${docker.image.name}</name>
+                                            <build>
+                                                <tags>
+                                                    <tag>${docker.tag}</tag>
+                                                    <tag>${docker.tag1}</tag>
+                                                    <tag>${docker.tag2}</tag>
+                                                    <tag>${docker.tag3}</tag>
+                                                </tags>
+                                            </build>
+                                        </image>
+                                    </images>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
     </profiles>
+
 
 </project>

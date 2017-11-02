@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.demostuff</groupId>
+        <artifactId>spring-boot-web-docker-parent</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>spring-boot-web-docker</artifactId>
+    <packaging>jar</packaging>
+
+    <name>Spring Boot Web Example App</name>
+    <description>Spring Boot Web Example with Docker Integration and Selenium/Cucumber Tests</description>
+
+    <properties>
+        <!-- Property to denote this is a docker artifact -->
+        <docker.skip>false</docker.skip>
+        <!-- Default port to expose -->
+        <docker.expose.app.port>8499</docker.expose.app.port>
+        <!-- Default port that this sprig-boot app listens on -->
+        <docker.internal.app.port>8080</docker.internal.app.port>
+
+        <selenium.version>3.6.0</selenium.version>
+        <maven-cucumber-reporting.version>3.7.0</maven-cucumber-reporting.version>
+        <cucumber.version>1.2.5</cucumber.version>
+
+    </properties>
+
+    <dependencies>
+
+        <!-- Web -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
+        <!-- Web with Tomcat + Embed -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Optional, for bootstrap -->
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>bootstrap</artifactId>
+            <version>3.3.7</version>
+        </dependency>
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>jquery</artifactId>
+            <version>3.2.1</version>
+        </dependency>
+
+        <!-- Selenium -->
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-java</artifactId>
+            <version>${selenium.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Selenium needs updated version for some reason -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>23.0</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>info.cukes</groupId>
+            <artifactId>cucumber-java8</artifactId>
+            <version>${cucumber.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>info.cukes</groupId>
+            <artifactId>cucumber-junit</artifactId>
+            <version>${cucumber.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Test -->
+        <!--<dependency>-->
+        <!--<groupId>org.springframework.boot</groupId>-->
+        <!--<artifactId>spring-boot-starter-test</artifactId>-->
+        <!--<scope>test</scope>-->
+        <!--</dependency>-->
+    </dependencies>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>net.masterthought</groupId>
+                    <artifactId>maven-cucumber-reporting</artifactId>
+                    <version>${maven-cucumber-reporting.version}</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
+        <plugins>
+            <plugin>
+                <groupId>net.masterthought</groupId>
+                <artifactId>maven-cucumber-reporting</artifactId>
+                <executions>
+                    <execution>
+                        <id>create-cucumber-report</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <projectName>test-report</projectName>
+                            <outputDirectory>${project.build.directory}</outputDirectory>
+                            <cucumberOutput>${project.build.directory}/cucumber/json</cucumberOutput>
+                            <parallelTesting>false</parallelTesting>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>integration-test</id>
+                        <goals>
+                            <goal>integration-test</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>verify</id>
+                        <goals>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <systemPropertyVariables>
+                        <app.url>${app.url}</app.url>
+                        <chrome.binaries.basedir>${chrome.binaries.basedir}</chrome.binaries.basedir>
+                        <docker.selenium.service.port>${docker.selenium.service.port}</docker.selenium.service.port>
+                        <selenium.env>${selenium.env}</selenium.env>
+                    </systemPropertyVariables>
+                    <includes>**/*IT.java</includes>
+                    <useSystemClassLoader>false</useSystemClassLoader>
+                </configuration>
+            </plugin>
+        </plugins>
+
+        <resources>
+            <resource>
+                <directory>${project.basedir}/src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+
+        <testResources>
+            <testResource>
+                <directory>${project.basedir}/src/test/resources</directory>
+                <filtering>true</filtering>
+            </testResource>
+        </testResources>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>spring-boot-intg</id>
+            <activation>
+                <property>
+                    <name>!env.DOCKER_HOST</name>
+                </property>
+            </activation>
+            <properties>
+                <app.url>http://localhost:${tomcat.http.port}</app.url>
+                <selenium.env>developer</selenium.env>
+            </properties>
+            <build>
+            <plugins>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>build-helper-maven-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <id>reserve-tomcat-port</id>
+                            <goals>
+                                <goal>reserve-network-port</goal>
+                            </goals>
+                            <phase>process-resources</phase>
+                            <configuration>
+                                <portNames>
+                                    <portName>tomcat.http.port</portName>
+                                </portNames>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <id>pre-integration-test</id>
+                            <goals>
+                                <goal>start</goal>
+                            </goals>
+                            <configuration>
+                                <arguments>
+                                    <argument>--server.port=${tomcat.http.port}</argument>
+                                </arguments>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>post-integration-test</id>
+                            <goals>
+                                <goal>stop</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>docker-intg</id>
+            <activation>
+                <property>
+                    <name>env.DOCKER_HOST</name>
+                </property>
+            </activation>
+            <properties>
+                <app.url>http://localhost:${docker.app.port}</app.url>
+                <selenium.env>docker</selenium.env>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>io.fabric8</groupId>
+                        <artifactId>docker-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>docker-run</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>start</goal>
+                                </goals>
+                                <configuration>
+                                    <showLogs>true</showLogs>
+                                    <startParallel>false</startParallel>
+                                    <images>
+                                        <image>
+                                            <name>${docker.image.name}</name>
+                                            <alias>app</alias>
+                                            <run>
+                                                <ports>
+                                                    <port>docker.app.port:${docker.internal.app.port}</port>
+                                                </ports>
+                                                <dependsOn>
+                                                    <container>configuration</container>
+                                                </dependsOn>
+                                                <wait>
+                                                    <!--<log>Started SpringBootWebApplication</log>-->
+                                                    <http>
+                                                        <url>http://localhost:${docker.app.port}/health</url>
+                                                    </http>
+                                                    <exec>
+                                                        <postStart>env</postStart>
+                                                    </exec>
+                                                    <time>120000</time>
+                                                </wait>
+                                                <log>
+                                                    <prefix>APP</prefix>
+                                                </log>
+                                            </run>
+                                        </image>
+                                        <image>
+                                            <alias>selenium</alias>
+                                            <name>selenium/standalone-chrome:latest</name>
+                                            <run>
+                                                <ports>
+                                                    <port>docker.selenium.service.port:4444</port>
+                                                    <port>docker.selenium.vnc.port:5900</port>
+                                                </ports>
+                                                <wait>
+                                                    <!--<log>Selenium Server is up and running</log>-->
+                                                    <tcp>
+                                                        <mode>mapped</mode>
+                                                        <ports>4444,5900</ports>
+                                                    </tcp>
+                                                    <exec>
+                                                        <postStart>env</postStart>
+                                                    </exec>
+                                                    <time>60000</time>
+                                                </wait>
+                                                <log>
+                                                    <prefix>SELENIUM</prefix>
+                                                </log>
+                                            </run>
+                                        </image>
+                                    </images>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>docker-stop</id>
+                                <phase>post-integration-test</phase>
+                                <goals>
+                                    <goal>stop</goal>
+                                </goals>
+                                <configuration>
+                                    <skip>${docker.skip}</skip>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+
+</project>

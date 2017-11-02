@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <contextName>@project.build.finalName@.@project.packaging@</contextName>
+    <statusListener class="ch.qos.logback.core.status.NopStatusListener"/>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>%d{dd-MMM-yyyy HH:mm:ss.SSS} %-5level [%thread] [%contextName] %logger{36} - %msg%n</Pattern>
+        </layout>
+    </appender>
+
+    <logger name="org.demostuff" level="debug" additivity="false">
+        <appender-ref ref="STDOUT"/>
+    </logger>
+
+    <root level="warn">
+        <appender-ref ref="STDOUT"/>
+    </root>
+
+</configuration>

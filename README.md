@@ -1,4 +1,4 @@
-# SpringBoot+Web+Jsp with Docker Integration
+# SpringBoot+Web with Docker and Cucumber Test Integration
 
 ### Purpose
 
@@ -19,6 +19,8 @@ mvn clean verify
 
 ### Notes
 - See https://dmp.fabric8.io/ for details documentation for the docker-maven-plugin.
-- Dockerfile - See this blog for an explaination on optimizing/aligning jvm memory vs docker container assigned memory,
+- See this blog for an explaination on optimizing/aligning jvm memory vs docker container assigned memory,
 https://blog.csanchez.org/2017/05/31/running-a-jvm-in-a-container-without-getting-killed/
+
+
 
