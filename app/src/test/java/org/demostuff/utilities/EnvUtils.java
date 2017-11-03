@@ -9,13 +9,27 @@ import org.slf4j.LoggerFactory;
 public class EnvUtils {
     private  static final Logger LOG = LoggerFactory.getLogger(EnvUtils.class);
 
-    public static final String DEFAULT_ENV = System.getProperty("selenium.env","developer");
+    public static final String DEFAULT_SELENIUM_ENV = getDefaultSeleniumEnv();
 
     public static final String APP_URL = "app.url";
 
     private static Properties envProperties = null;
 
-    private static String environmentFilename = String.format("env-%s.properties", System.getProperty("env", DEFAULT_ENV));
+    private static String environmentFilename = String.format("env-%s.properties", System.getProperty("env", DEFAULT_SELENIUM_ENV));
+
+    private static String getDefaultSeleniumEnv() {
+        String ret = null;
+        for (String k: System.getProperties().stringPropertyNames()) {
+            if (k.startsWith("idea.test")) {
+                ret = "developer";
+                break;
+            }
+        }
+        if (ret == null) {
+            ret = System.getProperty("selenium.env","maven");
+        }
+        return ret;
+    }
 
     public static String getEnvProperty(String key) {
         String ret = null;
