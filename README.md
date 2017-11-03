@@ -8,7 +8,7 @@ Useful as a *template* project to get you going quickly with docker and integrat
 
 - Java 8.x
 - Maven 3.x
-- Docker installed locally and DOCKER_HOST environment variable set, e.g. DOCKER_HOST=tcp://localhost:2375
+- (Optional) Docker installed locally and DOCKER_HOST environment variable set, e.g. DOCKER_HOST=tcp://localhost:2375
 
 
 ### Quickstart

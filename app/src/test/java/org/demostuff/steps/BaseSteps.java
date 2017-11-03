@@ -1,6 +1,8 @@
 package org.demostuff.steps;
 
-import cucumber.api.Scenario;
+import java.net.URL;
+import java.util.concurrent.TimeUnit;
+
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
@@ -10,9 +12,7 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.net.URL;
-import java.util.concurrent.TimeUnit;
+import cucumber.api.Scenario;
 
 public class BaseSteps {
     private static final Logger LOG = LoggerFactory.getLogger(BaseSteps.class);
@@ -76,8 +76,6 @@ public class BaseSteps {
 
         WebDriver driver = null;
         ChromeOptions chromeOptions = new ChromeOptions();
-        // Do this because https://bugs.chromium.org/p/chromedriver/issues/detail?id=1901
-        chromeOptions.addArguments("--start-maximized");
         // Are we running against a docker-selenium
         int dockerSeleniumServicePort = -1;
         try {
@@ -93,17 +91,18 @@ public class BaseSteps {
         if (dockerSeleniumServicePort < 0) {
             if (OS.contains("windows")) {
                 System.setProperty("webdriver.chrome.driver", System.getProperty("chrome.binaries.basedir") + "/chromedriver.exe");
-                // Use chrome executable
+                // By default we use desktop installed chrome
+                // Use chromium executable
                 //chromeOptions.setBinary(getModuleBaseDir() + "/binaries/chrome-win32/chrome.exe");
             } else if (OS.contains("linux")) {
                 System.setProperty("webdriver.chrome.driver", System.getProperty("chrome.binaries.basedir") + "/chromedriver");
                 chromeOptions.addArguments("--no-sandbox");
-                // Use chrome executable
+                // By default we use desktop installed chrome
+                // Use chromium executable
                 //chromeOptions.setBinary(getModuleBaseDir() + "/binaries/chrome-linux/chrome");
             }
             driver = new ChromeDriver(chromeOptions);
             driver.manage().window().maximize();
-
         }
         return driver;
     }

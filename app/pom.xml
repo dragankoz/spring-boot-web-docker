@@ -186,7 +186,7 @@
             </activation>
             <properties>
                 <app.url>http://localhost:${tomcat.http.port}</app.url>
-                <selenium.env>developer</selenium.env>
+                <selenium.env>maven</selenium.env>
             </properties>
             <build>
             <plugins>
@@ -243,7 +243,7 @@
                 </property>
             </activation>
             <properties>
-                <app.url>http://localhost:${docker.app.port}</app.url>
+                <app.url>http://app:${docker.internal.app.port}</app.url>
                 <selenium.env>docker</selenium.env>
             </properties>
             <build>
@@ -288,13 +288,15 @@
                                             </run>
                                         </image>
                                         <image>
-                                            <alias>selenium</alias>
                                             <name>selenium/standalone-chrome:latest</name>
                                             <run>
                                                 <ports>
                                                     <port>docker.selenium.service.port:4444</port>
                                                     <port>docker.selenium.vnc.port:5900</port>
                                                 </ports>
+                                                <links>
+                                                    <link>app:app</link>
+                                                </links>
                                                 <wait>
                                                     <!--<log>Selenium Server is up and running</log>-->
                                                     <tcp>
