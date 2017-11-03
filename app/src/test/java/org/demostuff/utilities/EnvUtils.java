@@ -25,10 +25,7 @@ public class EnvUtils {
                 break;
             }
         }
-        if (ret == null) {
-            ret = System.getProperty("selenium.env","maven");
-        }
-        return ret;
+        return ret != null ? ret : System.getProperty("selenium.env","maven");
     }
 
     public static String getEnvProperty(String key) {
