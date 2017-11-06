@@ -1,14 +1,12 @@
-package org.demostuff.pages;
+package org.demostuff.cucumber.pages;
 
 import static org.junit.Assert.assertTrue;
 import java.util.Map;
 
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.Select;
-import org.springframework.util.StringUtils;
 
 /**
  * Created by dragan.kocovski on 30/05/2017.

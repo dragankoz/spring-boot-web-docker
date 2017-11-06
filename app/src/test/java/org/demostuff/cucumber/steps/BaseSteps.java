@@ -1,4 +1,4 @@
-package org.demostuff.steps;
+package org.demostuff.cucumber.steps;
 
 import java.net.URL;
 import java.util.concurrent.TimeUnit;

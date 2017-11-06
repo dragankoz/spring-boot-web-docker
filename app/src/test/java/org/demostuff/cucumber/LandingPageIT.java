@@ -1,8 +1,8 @@
-package org.demostuff;
+package org.demostuff.cucumber;
 
-import static org.demostuff.utilities.CucumberConstants.FEATURES_PREFIX;
-import static org.demostuff.utilities.CucumberConstants.PACKAGE_PREFIX;
-import static org.demostuff.LandingPageIT.FEATURE_NAME;
+import static org.demostuff.cucumber.utilities.CucumberConstants.FEATURES_PREFIX;
+import static org.demostuff.cucumber.utilities.CucumberConstants.PACKAGE_PREFIX;
+import static org.demostuff.cucumber.LandingPageIT.FEATURE_NAME;
 
 import org.junit.runner.RunWith;
 import cucumber.api.CucumberOptions;

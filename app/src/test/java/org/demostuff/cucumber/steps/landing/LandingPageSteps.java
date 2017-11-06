@@ -1,10 +1,10 @@
-package org.demostuff.steps.landing;
+package org.demostuff.cucumber.steps.landing;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.demostuff.pages.LandingPage;
-import org.demostuff.steps.BaseSteps;
+import org.demostuff.cucumber.pages.LandingPage;
+import org.demostuff.cucumber.steps.BaseSteps;
 import org.openqa.selenium.By;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

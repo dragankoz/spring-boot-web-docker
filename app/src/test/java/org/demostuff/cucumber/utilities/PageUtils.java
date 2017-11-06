@@ -1,4 +1,4 @@
-package org.demostuff.utilities;
+package org.demostuff.cucumber.utilities;
 
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;

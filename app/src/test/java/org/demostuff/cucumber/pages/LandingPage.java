@@ -1,6 +1,6 @@
-package org.demostuff.pages;
+package org.demostuff.cucumber.pages;
 
-import org.demostuff.utilities.EnvUtils;
+import org.demostuff.cucumber.utilities.EnvUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.slf4j.Logger;

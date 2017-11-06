@@ -1,4 +1,4 @@
-package org.demostuff.utilities;
+package org.demostuff.cucumber.utilities;
 
 import java.net.URL;
 import java.util.Properties;
