@@ -1,4 +1,4 @@
-package org.demostuff;
+package org.demostuff.utilities;
 
 public class CucumberConstants {
     public static final String FEATURES_PREFIX = "src/test/resources/features";

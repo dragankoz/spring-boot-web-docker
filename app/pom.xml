@@ -92,11 +92,11 @@
         </dependency>
 
         <!-- Test -->
-        <!--<dependency>-->
-        <!--<groupId>org.springframework.boot</groupId>-->
-        <!--<artifactId>spring-boot-starter-test</artifactId>-->
-        <!--<scope>test</scope>-->
-        <!--</dependency>-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -111,22 +111,46 @@
         </pluginManagement>
 
         <plugins>
+
             <plugin>
-                <groupId>net.masterthought</groupId>
-                <artifactId>maven-cucumber-reporting</artifactId>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>create-cucumber-report</id>
-                        <phase>post-integration-test</phase>
+                        <id>reserve-tomcat-port</id>
                         <goals>
-                            <goal>generate</goal>
+                            <goal>reserve-network-port</goal>
+                        </goals>
+                        <phase>process-resources</phase>
+                        <configuration>
+                            <portNames>
+                                <portName>tomcat.http.port</portName>
+                            </portNames>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>pre-integration-test</id>
+                        <goals>
+                            <goal>start</goal>
                         </goals>
                         <configuration>
-                            <projectName>test-report</projectName>
-                            <outputDirectory>${project.build.directory}</outputDirectory>
-                            <cucumberOutput>${project.build.directory}/cucumber/json</cucumberOutput>
-                            <parallelTesting>false</parallelTesting>
+                            <arguments>
+                                <argument>--server.port=${tomcat.http.port}</argument>
+                            </arguments>
                         </configuration>
+                    </execution>
+                    <execution>
+                        <id>post-integration-test</id>
+                        <goals>
+                            <goal>stop</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>
@@ -149,16 +173,38 @@
                     </execution>
                 </executions>
                 <configuration>
+
                     <systemPropertyVariables>
-                        <app.url>${app.url}</app.url>
+                        <spring.app.url>http://localhost:${tomcat.http.port}</spring.app.url>
+                        <selenium.app.url>${selenium.app.url}</selenium.app.url>
                         <chrome.binaries.basedir>${chrome.binaries.basedir}</chrome.binaries.basedir>
                         <docker.selenium.service.port>${docker.selenium.service.port}</docker.selenium.service.port>
                         <selenium.env>${selenium.env}</selenium.env>
                     </systemPropertyVariables>
                     <includes>**/*IT.java</includes>
-                    <useSystemClassLoader>false</useSystemClassLoader>
                 </configuration>
             </plugin>
+
+            <plugin>
+                <groupId>net.masterthought</groupId>
+                <artifactId>maven-cucumber-reporting</artifactId>
+                <executions>
+                    <execution>
+                        <id>create-cucumber-report</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <projectName>test-report</projectName>
+                            <outputDirectory>${project.build.directory}</outputDirectory>
+                            <cucumberOutput>${project.build.directory}/cucumber/json</cucumberOutput>
+                            <parallelTesting>false</parallelTesting>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
         </plugins>
 
         <resources>
@@ -178,64 +224,6 @@
 
     <profiles>
         <profile>
-            <id>spring-boot-intg</id>
-            <activation>
-                <property>
-                    <name>!env.DOCKER_HOST</name>
-                </property>
-            </activation>
-            <properties>
-                <app.url>http://localhost:${tomcat.http.port}</app.url>
-                <selenium.env>maven</selenium.env>
-            </properties>
-            <build>
-            <plugins>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>build-helper-maven-plugin</artifactId>
-                    <executions>
-                        <execution>
-                            <id>reserve-tomcat-port</id>
-                            <goals>
-                                <goal>reserve-network-port</goal>
-                            </goals>
-                            <phase>process-resources</phase>
-                            <configuration>
-                                <portNames>
-                                    <portName>tomcat.http.port</portName>
-                                </portNames>
-                            </configuration>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-maven-plugin</artifactId>
-                    <executions>
-                        <execution>
-                            <id>pre-integration-test</id>
-                            <goals>
-                                <goal>start</goal>
-                            </goals>
-                            <configuration>
-                                <arguments>
-                                    <argument>--server.port=${tomcat.http.port}</argument>
-                                </arguments>
-                            </configuration>
-                        </execution>
-                        <execution>
-                            <id>post-integration-test</id>
-                            <goals>
-                                <goal>stop</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-            </plugins>
-            </build>
-        </profile>
-
-        <profile>
             <id>docker-intg</id>
             <activation>
                 <property>
@@ -243,7 +231,7 @@
                 </property>
             </activation>
             <properties>
-                <app.url>http://app:${docker.internal.app.port}</app.url>
+                <selenium.app.url>http://app:${docker.internal.app.port}</selenium.app.url>
                 <selenium.env>docker</selenium.env>
             </properties>
             <build>

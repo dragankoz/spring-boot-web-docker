@@ -25,7 +25,7 @@ public class LandingPage extends BasePage {
     }
 
     public static LandingPage go(WebDriver driver) {
-        driver.navigate().to(EnvUtils.getEnvProperty(EnvUtils.APP_URL));
+        driver.navigate().to(EnvUtils.getEnvProperty(EnvUtils.SELENIUM_APP_URL));
         return new LandingPage(driver);
     }
 

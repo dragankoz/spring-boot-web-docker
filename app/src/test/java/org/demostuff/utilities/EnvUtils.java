@@ -11,7 +11,7 @@ public class EnvUtils {
 
     public static final String DEFAULT_SELENIUM_ENV = getDefaultSeleniumEnv();
 
-    public static final String APP_URL = "app.url";
+    public static final String SELENIUM_APP_URL = "selenium.app.url";
 
     private static Properties envProperties = null;
 
