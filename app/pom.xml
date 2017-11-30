@@ -111,6 +111,33 @@
         </pluginManagement>
 
         <plugins>
+            <plugin>
+                <groupId>cz.habarta.typescript-generator</groupId>
+                <artifactId>typescript-generator-maven-plugin</artifactId>
+                <version>1.29.366</version>
+                <executions>
+                    <execution>
+                        <id>tsgen</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <phase>none</phase>
+                    </execution>
+                </executions>
+                <configuration>
+                    <jsonLibrary>jackson2</jsonLibrary>
+                    <outputKind>module</outputKind>
+                    <addTypeNameSuffix>Data</addTypeNameSuffix>
+                    <mapClasses>asClasses</mapClasses>
+                    <outputFileType>implementationFile</outputFileType>
+                    <noFileComment>true</noFileComment>
+                    <displaySerializerWarning>false</displaySerializerWarning>
+                    <outputFile>${project.build.directory}/demo-ts/generated.ts</outputFile>
+                    <classPatterns>
+                        <pattern>org.demostuff.pojo.*</pattern>
+                    </classPatterns>
+                </configuration>
+            </plugin>
 
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
