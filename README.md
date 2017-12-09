@@ -8,14 +8,24 @@ Useful as a *template* project to get you going quickly with docker and integrat
 
 - Java 8.x
 - Maven 3.x
-- (Optional) Docker installed locally and DOCKER_HOST environment variable set, e.g. DOCKER_HOST=tcp://localhost:2375
+- (Optional) Docker installed locally and DOCKER_HOST environment variable set,
 
+Linux
+```
+export DOCKER_HOST=unix:///var/run/docker.sock
+```
 
-### Quickstart
+Windows
+```
+set DOCKER_HOST=npipe:////./pipe/docker_engine
+```
+
+Build
 
 ```
 mvn clean verify
 ```
+
 
 ### Notes
 - See https://dmp.fabric8.io/ for details documentation for the docker-maven-plugin.

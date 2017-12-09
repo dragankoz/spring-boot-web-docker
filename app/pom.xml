@@ -289,9 +289,13 @@
                                                 </dependsOn>
                                                 <wait>
                                                     <!--<log>Started SpringBootWebApplication</log>-->
-                                                    <http>
+                                                    <!--http>
                                                         <url>http://localhost:${docker.app.port}/health</url>
-                                                    </http>
+                                                    </http-->
+                                                    <tcp>
+                                                        <mode>mapped</mode>
+                                                        <ports>${docker.internal.app.port}</ports>
+                                                    </tcp>
                                                     <exec>
                                                         <postStart>env</postStart>
                                                     </exec>
